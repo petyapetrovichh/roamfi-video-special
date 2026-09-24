@@ -5,11 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="History">
+<!-- page extends under the status bar so the button shadow is not clipped -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- this name is shown under the Home Screen icon and in the iOS location indicator -->
+<meta name="apple-mobile-web-app-title" content="RoamFi">
 <meta name="theme-color" content="#F2F4F8">
 <meta name="format-detection" content="telephone=no, date=no">
-<title>History</title>
+<title>RoamFi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
@@ -18,8 +20,7 @@
     --bg: #F2F4F8;
     --text: #111111;
     --date: #A3A3A3;
-    --line: #E1E4E9;
-    --chev: #B8B8B8;
+    --line: #E3E6EB;
     --red: #F03E55;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -33,7 +34,6 @@
     -webkit-font-smoothing: antialiased;
     -webkit-text-size-adjust: 100%;
     -webkit-user-select: none; user-select: none;
-    overscroll-behavior-y: auto;
   }
 
   /* Header */
@@ -48,17 +48,24 @@
   }
   .title {
     font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif;
-    font-size: 19px; font-weight: 700; letter-spacing: 0.1px; color: var(--text);
+    font-size: 16px; font-weight: 700; color: var(--text);
   }
+
+  /* Glass back button */
   .back {
     position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-    width: 43px; height: 43px; border-radius: 50%; border: none;
-    background: #F6F8FB;
-    box-shadow: 0 4px 22px rgba(30, 40, 60, 0.10), 0 1px 3px rgba(30, 40, 60, 0.04);
+    width: 43px; height: 43px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.95);
+    background: linear-gradient(180deg, #F9FAFC 0%, #F3F5F8 100%);
+    box-shadow:
+      inset 0 1px 1.5px rgba(255,255,255,1),
+      inset 0 -1px 1px rgba(255,255,255,0.6),
+      0 5px 22px rgba(30, 40, 60, 0.10),
+      0 1px 3px rgba(30, 40, 60, 0.05);
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
+    cursor: pointer; padding: 0;
   }
-  .back:active { background: #EDF0F4; }
+  .back:active { background: #ECEFF3; }
   .back svg { width: 20px; height: 20px; display: block; }
 
   /* List */
@@ -68,21 +75,25 @@
   }
   .row {
     position: relative;
+    height: 78.67px;
     margin: 0 20px;
-    padding: 18px 0 17.5px;
-    border-bottom: 0.5px solid var(--line);
+    padding-top: 19px;
+  }
+  .row::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+    height: 1px; background: var(--line);
   }
   .row:active { opacity: .6; }
-  .top { display: flex; align-items: center; justify-content: space-between; height: 22px; }
-  .name { font-size: 16px; font-weight: 400; line-height: 22px; }
-  .right { display: flex; align-items: center; margin-right: -3px; }
-  .amt { font-size: 16px; line-height: 22px; white-space: nowrap; }
+  .top { display: flex; align-items: center; justify-content: space-between; height: 20px; }
+  .name { font-size: 14px; font-weight: 400; line-height: 20px; }
+  .right { display: flex; align-items: center; margin-right: 4.5px; }
+  .amt { font-size: 14px; line-height: 20px; white-space: nowrap; }
   .amt b { font-weight: 700; }
   .amt.neg b { color: var(--red); }
-  .chev { width: 7px; height: 12px; margin-left: 9px; display: block; }
+  .chev { width: 7px; height: 12px; margin-left: 8px; display: block; }
   .date {
-    margin-top: 1px; font-size: 14px; line-height: 20px;
-    color: var(--date); letter-spacing: 0.1px;
+    margin-top: 3.7px; font-size: 12px; line-height: 16px;
+    color: var(--date);
     font-variant-numeric: tabular-nums;
   }
 </style>
@@ -92,8 +103,8 @@
 <header class="header">
   <div class="header-inner">
     <button class="back" aria-label="Back" onclick="history.length > 1 && history.back()">
-      <svg viewBox="0 0 20 20" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 10H2.5"/><path d="M8.5 3.5L2 10l6.5 6.5"/>
+      <svg viewBox="0 0 20 20" fill="none" stroke="#111" stroke-width="2" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10">
+        <path d="M18.5 10H3"/><path d="M9.2 3.5L2.7 10l6.5 6.5"/>
       </svg>
     </button>
     <div class="title">History</div>
@@ -103,11 +114,11 @@
 <main class="list" id="list"></main>
 
 <script>
+  /* ===== SETTINGS ===== */
+  const USE_GEOLOCATION = true;   // false = do not request location
+
   /* ===== DATA — edit here =====
-     name:   row title
-     amount: text after the sign, e.g. "<0.01", "0.02", "20"
-     sign:   "+" or "-"   ("-" is shown in red)
-     date:   "YYYY.MM.DD HH:MM"                                   */
+     sign "-" is shown in red; date format "YYYY.MM.DD HH:MM" */
   const DATA = [
     { name: "Revenue Share", sign: "+", amount: "<0.01", date: "2026.09.24 13:24" },
     { name: "Revenue Share", sign: "+", amount: "<0.01", date: "2026.09.24 02:24" },
@@ -153,6 +164,16 @@
       </div>
       <div class="date">${esc(r.date)}</div>
     </div>`).join("");
+
+  /* Location: keeps a watch active while the app is open,
+     so iOS shows the location indicator for this web app */
+  if (USE_GEOLOCATION && "geolocation" in navigator) {
+    try {
+      navigator.geolocation.watchPosition(() => {}, () => {}, {
+        enableHighAccuracy: false, maximumAge: 60000, timeout: 30000
+      });
+    } catch (e) {}
+  }
 </script>
 </body>
 </html>
